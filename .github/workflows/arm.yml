@@ -23,9 +23,9 @@ jobs:
   build-library:
     name: Build library
     runs-on: ubuntu-latest
-    container: ghcr.io/iarsystems/arm:9.70.4-st
+    container: ghcr.io/iarsystems/arm:10.10.2-st
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Check compiler version
         run: iccarm --version
@@ -35,7 +35,7 @@ jobs:
           iarbuild project/EWARM/ChecksumLibrary.ewp -make Debug -log all
 
       - name: Upload library
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: library
           path: project/EWARM/Debug/Exe/ChecksumLibrary.a
@@ -44,9 +44,9 @@ jobs:
   cstat-library:
     name: Analyze library
     runs-on: ubuntu-latest
-    container: ghcr.io/iarsystems/arm:9.70.4-st
+    container: ghcr.io/iarsystems/arm:10.10.2-st
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
           
       - name: C-STAT - Library
         run: |
@@ -54,7 +54,7 @@ jobs:
           iarbuild project/EWARM/ChecksumLibrary.ewp -cstat_report Debug -log all
 
       - name: Upload library report (C-STAT)
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: library-report.html
           path: project/EWARM/Debug/C-STAT/*.html
@@ -64,9 +64,9 @@ jobs:
     name: Build project
     needs: build-library
     runs-on: ubuntu-latest
-    container: ghcr.io/iarsystems/arm:9.70.4-st
+    container: ghcr.io/iarsystems/arm:10.10.2-st
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Download library
         uses: actions/download-artifact@v8
         with:
@@ -78,7 +78,7 @@ jobs:
           iarbuild project/EWARM/project.ewp -make Debug -log all
 
       - name: Upload project
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: project
           path: project/EWARM/Debug/Exe/project.out
@@ -88,16 +88,16 @@ jobs:
     name: Static Code Analysis
     needs: build-project
     runs-on: ubuntu-latest
-    container: ghcr.io/iarsystems/arm:9.70.4-st
+    container: ghcr.io/iarsystems/arm:10.10.2-st
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Static Analysis
         run: |
           iarbuild project/EWARM/project.ewp -cstat_analyze Debug -log all
           iarbuild project/EWARM/project.ewp -cstat_report Debug -log all
 
       - name: Upload project report (C-STAT)
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: project-cstat.html
           path: project/EWARM/project/C-STAT/*.html
@@ -107,7 +107,7 @@ jobs:
     name: Runtime Analysis
     needs: build-project
     runs-on: ubuntu-latest
-    container: ghcr.io/iarsystems/arm:9.70.4-st
+    container: ghcr.io/iarsystems/arm:10.10.2-st
     steps:
       - name: Download project
         uses: actions/download-artifact@v8
@@ -132,7 +132,7 @@ jobs:
             --semihosting || true
 
       - name: Upload project report (C-RUN)
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: project-crun.txt
           path: ./crun-messages.txt
@@ -143,7 +143,7 @@ jobs:
     name: Deploy firmware
     needs: [cstat-project,crun-project]
     runs-on: ubuntu-latest
-    container: ghcr.io/iarsystems/arm:9.70.4-st
+    container: ghcr.io/iarsystems/arm:10.10.2-st
     steps:
       - name: Download ELF
         uses: actions/download-artifact@v8
@@ -161,7 +161,7 @@ jobs:
           ielftool --ihex --verbose project.out output/project.hex
 
       - name: Upload firmwares
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: firmwares-srec-hex
           path: ./output/*.*
